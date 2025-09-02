@@ -14,7 +14,7 @@ AB = A@B.T
 
 print(f"AB:\n{AB}")
 
-# Want use SGD to find B
+# Want use gradient descent to find B
 
 class MatrixFactorisation(nn.Module):
 
@@ -27,15 +27,19 @@ class MatrixFactorisation(nn.Module):
 
 
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# device = "cpu"
-device = "cuda"
+device = "cpu"
+# device = "cuda"
 print(f"Device={device}")
 
 model = MatrixFactorisation().to(device)
 print(f"Initial model.weights:\n{model.weights}")
 
 loss_fn = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=0.01)
+# loss_fn = nn.HuberLoss(delta=1)
+
+# optimizer = optim.Adam(model.parameters(), lr=0.01)
+optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
+# optimizer = optim.SGD(model.parameters(), lr=0.1)
 
 num_epochs = 1000
 
@@ -44,21 +48,15 @@ AB = AB.to(device)
 
 for epoch in range(num_epochs):
 
-    # print("="*80)
-    # print(f"Epoch: {epoch}")
-
     optimizer.zero_grad()
 
     # Forward pass
     output = model.forward(A)
     loss = loss_fn(output, AB)
-    # print(f"output:\n{output}")
     # print(f"loss: {loss}")
 
     # Backward pass
     loss.backward()
-
-    # print(f"grad:\n{model.weights.grad}")
 
     # Update parameters
     optimizer.step()
